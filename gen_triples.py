@@ -1,3 +1,10 @@
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import csv
+import pandas as pd
+sns.set_theme(style="dark")
+
 def gen_triples(lam, mew):
     x = 2 * lam * mew
     y = lam ** 2 - mew ** 2
@@ -35,5 +42,25 @@ def gen_triplesTYN1(cutoff):
         set_triples.append(gen_triples(-1,i))
     return set_triples
 
-print(gen_triplesTY1(10))
-print(gen_triplesTYN1(10))
+print(gen_triplesTY1(20))
+print(gen_triplesTYN1(20))
+
+data = gen_triplesTY1(20)
+
+print(data)
+params = ['mew','lam','total']
+df = pd.DataFrame(data,columns=params)
+print(df)
+df.to_csv('./dataset.csv')
+
+
+triples=pd.read_csv("./dataset.csv")
+
+# Need to find a good way to visualize
+# Also more data variations, along with negative 
+# instances to make the data more interesting!
+
+sns.catplot(data=triples,kind='swarm', x='mew',y='lam',hue='total')
+f, ax = plt.subplots(figsize=(9,6))
+plt.show()
+
