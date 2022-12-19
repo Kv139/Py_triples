@@ -3,6 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import csv
 import pandas as pd
+import random
 sns.set_theme(style="dark")
 
 def gen_triples(lam, mew):
@@ -12,8 +13,6 @@ def gen_triples(lam, mew):
     corresponding_triple = [x,y,z]
     return corresponding_triple
 
-print(gen_triples(1,2))
-print(gen_triples(2,3))
 
 def relatively_prime(x,y):
     if y == 1:
@@ -27,19 +26,36 @@ def relatively_prime(x,y):
         except ZeroDivisionError:
             return False
 
-# Testing Relatively_prime
+# 6, 8 
+def relatively_prime2(x,y):
+    if y == 1:
+        return False
+    if y == 0:
+        return x
+    else:
+        y = y % x
+        try:
+            return relatively_prime2(y,x)
+        except ZeroDivisionError:
+            return x
+
+
+print("Testing relatively Prime")
 # Case 3,5 - True
 print(relatively_prime(3,5))
 # Case 4,7 - True
 print(relatively_prime(4,7))
 # Case 3,6 - False
-print(relatively_prime(3,6))
+print("==========")
+print("Testing relatively Prime2")
+#print(relatively_prime2(3,6))
 # Case 5,10- False
-print(relatively_prime(5,10))
+print(relatively_prime2(6,8))
 # Case 5, 3 - True
-print(relatively_prime(5,3))
+print(relatively_prime2(5,3))
 # Case 20,15 - False
-print(relatively_prime(20,15))
+print(relatively_prime2(20,15))
+print("============")
 
 
 
@@ -48,14 +64,58 @@ def verify_triples(my_triple):
     sum2 = my_triple[1] ** 2
     sum3 = my_triple[2] ** 2
     if sum1 + sum2 == sum3:
-        return "This is a Pythagorean Triple"
+        return True
     else:
-        return "Not a triple - double check please"
+        return False
 
 
-print(verify_triples(gen_triples(1,2)))
-print(verify_triples(gen_triples(2,3)))
+def gen_ran_triples(quantity):
+    set_triples = []
+    for i in range(1,quantity):
+        x = random.randrange(1,1000)
+        y = random.randrange(1,1000)
+        set_triples.append(gen_triples(x,y))
+    return set_triples
 
+print("TESTING")
+#print(gen_ran_triples(10))
+print("========")
+
+print("TESTING RANDOM GENERATION")
+data2 = gen_ran_triples(500)
+for i in data2:
+    if verify_triples(i) == False:
+        print("FAILED TRIPLE")
+print("=============")
+
+# haha it works!
+
+def normalize_triple(triple):
+    is_prime = relatively_prime2(triple[0],triple[1])
+    while is_prime != False:
+        triple[0] = triple[0] / is_prime
+        triple[1] = triple[1] / is_prime
+        triple[2] = triple[2] / is_prime
+        is_prime = relatively_prime2(triple[0],triple[1])
+    if verify_triples(triple) == False:
+        print(triple)
+    return triple
+
+print("TESTING NORMALIZATION OF RANDOM DATA")
+for i in data2:
+    if verify_triples(i) == False:
+        print(i)
+        print("FAILED TRIPLE")
+print()
+print("================")
+
+print("TESTING SPECIFIC INSTANCE OF FAILURE")
+
+print("TESTING normalize_triple")
+#print(relatively_prime2(8,6))
+#normalize_triple([6,8,10])
+#normalize_triple([12,16,20])
+print("=========")
 
 def gen_triplesTY1(cutoff):
     set_triples = []
@@ -69,13 +129,8 @@ def gen_triplesTYN1(cutoff):
         set_triples.append(gen_triples(-1,i))
     return set_triples
 
-#print(gen_triplesTY1(20))
-#print(gen_triplesTYN1(20))
-
-data = gen_triplesTY1(20)
-
 params = ['mew','lam','total']
-df = pd.DataFrame(data,columns=params)
+df = pd.DataFrame(data2,columns=params)
 df.to_csv('./dataset.csv')
 
 
@@ -85,9 +140,9 @@ triples=pd.read_csv("./dataset.csv")
 # Also more data variations, along with negative 
 # instances to make the data more interesting!
 
-sns.catplot(data=triples,kind='swarm', x='mew',y='lam',hue='total')
+#sns.catplot(data=triples,kind='swarm', x='mew',y='total',hue='lam')
 sns.relplot(x="mew", y="lam", hue="total",
-            sizes=(40, 400), alpha=.5, palette="muted",
-            height=6, data=triples)
+        alpha=.5, palette="muted",
+        height=5, data=triples)
 
-#plt.show()
+plt.show()
